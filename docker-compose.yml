@@ -1,0 +1,35 @@
+version: '3'
+services:
+  postgres:
+    image: 'postgres:latest'
+    environment:
+      - POSTGRES_PASSWORD=2001
+    ports:
+      - "5432:5432" 
+
+  api:
+    build:
+      context: ./backend  
+      dockerfile: DockerFile  
+    volumes:
+      - /app/node_modules  
+      - ./backend:/app 
+    environment:
+      - DB_HOST=postgres  
+      - DB_USERNAME=postgres
+      - DB_PASSWORD=2001
+      - DB_DATABASE=registrationDb
+    depends_on:
+      - postgres  # Ensure the API service starts after the database is ready
+    ports:
+      - "4000:5432"  # Expose the API server's port to the host
+
+  client:
+    build:
+      context: ./frontend  # Assuming you have a separate directory for the client
+      dockerfile: Dockerfile  # Adjust if you have a specific Dockerfile name
+    volumes:
+      - /app/node_modules  # Avoid overwriting node_modules in the container
+      - ./frontend:/app  # Mount the frontend directory to /app in the container
+    ports:
+      - "5173:5173"  # Map the client app's internal port to the host's port
